@@ -4,40 +4,43 @@ fig = figure(... % Create Figure, name it, position it
     'name','Reflection Mapping', ...
     'Units','normalized', ...
     'Position',[0.0153    0.0588    0.9766    0.8037]);
-fileload = '2';
-matFile = dir(['../../Data/mat/*' fileload '*']);
+ramanFileName = '2';
+matFile = dir(['../../Data/mat/*' ramanFileName '*']);
 if length(matFile) > 1
     names1 = struct2cell(matFile);
-    [s,v] = listdlg('PromptString','Select a file:',...
+    [s,didSelectFile] = listdlg('PromptString','Select a Raman file:',...
         'SelectionMode','single',...
         'ListString',names1(1,:)')
-    if isempty(s)
-        disp('No Reflection was chosen');
+    if isequal(didSelectFile,0)
+        disp('No Raman file was chosen');
         close all force;
         return;
     end
-    fileload = names1{1,s};
+    ramanFileName = names1{1,s};
 else
-    fileload = matFile(1).name;
+    ramanFileName = matFile(1).name;
 end
-theVariables = load(['../../Data/mat/' fileload]);
+theVariables = load(['../../Data/mat/' ramanFileName]);
 defect_filename = 'bad_fit.txt';
 fitsquest = theVariables.fitsquest;
-a = regexp(fileload,'_','split');
+a = regexp(ramanFileName,'_','split');
 addpath('../../Data/ReflectionMaps/')
 f = dir(['../../Data/ReflectionMaps/*' a{1} '*Ra*Dspot.txt']); % to find
 
 if length(f) > 1
     names = struct2cell(f);
-    [s,v] = listdlg('PromptString','Select a file to load',...
+    [s,didSelectFile] = listdlg('PromptString','Select a Reflection file',...
         'SelectionMode','single',...
-        'ListString',names(1,:)')
-    if isempty(s)
-        disp('No Reflection was chosen');
-        close all force;
-        return;
+        'ListString',names(1,:)');
+    if isequal(didSelectFile,0)
+        disp('loading default map')
+        fileDspot = 'ReflMap_xx19Ra_c-pwr_foc_Dspot.txt';
+        filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
     end
+else
+    s = 1;
 end
+
 if isempty(f)
     allreflectionmaps = dir(['../../Data/ReflectionMaps/*Ra*Dspot.txt']);
     names = struct2cell(allreflectionmaps);
@@ -45,8 +48,12 @@ if isempty(f)
         'SelectionMode','single',...
         'ListString',names(1,:)')
     disp('There are no reflection maps')
-    return;
-else
+    disp('loading default map')
+    fileDspot = 'ReflMap_xx2_xx21Ra_c-pwr_foc_Dspot.txt';
+    filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
+end
+
+if isequal(length(f),1)
     fileDspot = f(s).name;
     filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
 end

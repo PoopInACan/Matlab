@@ -32,6 +32,30 @@ else
     yoriginal = importfile(filename);
 end
 disp(['Importing file: ' filename ]);
+ sz = size(yoriginal,2); 
+ %%
+ sz = 2705;
+ estimatedSecondsToCompletion = sz*1.33;
+ minutesToCompletion = floor(estimatedSecondsToCompletion/60);
+ secondsToCompletion = floor(rem(estimatedSecondsToCompletion/60,minutesToCompletion)*60);
+ disp(sprintf('Estimated Completion in: %d min and %d seconds',minutesToCompletion,secondsToCompletion));
+ currentTime = clock;
+ minToComp = currentTime(5) + minutesToCompletion;
+ secToComp = floor(currentTime(6) + secondsToCompletion);
+ hourToComp = currentTime(4);
+
+ if floor(currentTime(6) + secondsToCompletion) > 60
+     minToComp = currentTime(5) + minutesToCompletion + 1;
+     secToComp = floor(currentTime(6) + secondsToCompletion) - 60;
+ end
+ if minToComp > 60
+     minToComp = minToComp - 60;
+     hourToComp = hourToComp + 1;
+     if hourToComp > 12
+         hourToComp = hourToComp - 12;
+     end
+ end
+ disp(sprintf('Estimated Completion at: %2d:%2d:%2d',hourToComp,minToComp,secToComp));
 %% x-axis
 x = importdata('../../DataAnalysis/RamanTextFiles/xAxis.txt');
 x = AngtoWavenumbers(5318,x);

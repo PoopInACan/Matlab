@@ -1,9 +1,24 @@
 function indexOfDpositionSaved
 fig = figure(8);clf;
-set(fig,'KeyPressFcn',@fig_Callback)
-theVariables = load('941_1.mat');
+% set(fig,'KeyPressFcn',@pressSpaceToSaveIndexToFile)
+addpath('../../Data/mat/*');
+addpath('../../Data/Defect Positions on Raman/');
+matFile = dir('../../Data/mat/*.mat');
+if length(matFile) > 1
+    names1 = struct2cell(matFile);
+    [s,didSelectFile] = listdlg('PromptString','Select a Raman file:',...
+        'SelectionMode','single',...
+        'ListString',names1(1,:)');
+    if isequal(didSelectFile,0) % if no mat file was selected, exit program
+        disp('No Raman file was chosen');
+        close all force;
+        return; 
+    end
+    ramanFileName = names1{1,s};
+    theVariables = load(['../../Data/mat/' ramanFileName]);
+end
 fitsquest = theVariables.fitsquest;
-defect_filename = 'bad_fit.txt';
+defect_filename = '../../Data/Defect Positions on Raman/x3_defect_positions.txt';
 switch fitsquest
     case 'Yes'
         fwhm1 = theVariables.fwhm1;
@@ -61,7 +76,7 @@ sliderHandle = uicontrol('Style', 'slider',...
     'Tag','slidertag',...
     'Min',1,...
     'Max',numSteps,...
-    'KeyPressFcn',@fig_Callback, ...
+    'KeyPressFcn',@pressSpaceToSaveIndexToFile, ...
     'Value',1,...
     'SliderStep',[1/(numSteps-1) , 1/(numSteps-1) ],...
     'Callback', @plotValueInTextBox,...
@@ -116,7 +131,7 @@ disp('hi')
         prettyPlotLoop(figure(8),14,'no')
     end
 
-    function fig_Callback(source,eventdata)
+    function pressSpaceToSaveIndexToFile(source,eventdata)
         i = floor(get(sliderHandle,'Value'));
         if isequal(eventdata.Character,' ')
             %% Append new plot position to text file
@@ -136,6 +151,25 @@ disp('hi')
             fprintf(fileID,fmt,values);
             if l < nl
                 disp(sprintf('Added: %2.0f',values(end)));
+            end
+            fclose(fileID);
+        elseif isequal(eventdata.Character,'d')
+            fileID = fopen(defect_filename,'a+');
+            fmt = '%5d,\n';
+            frewind(fileID);
+            values1 = fscanf(fileID,'%f,\n');
+            l = length(values1);
+            fprintf(fileID,fmt,i);
+            frewind(fileID);
+            values = fscanf(fileID,'%f,\n');
+            nl = length(values);
+            fclose(fileID);
+            %% Eliminate duplicates and sort numbers
+            fileID = fopen(defect_filename,'w+');
+            values = setdiff(values1,i);
+            fprintf(fileID,fmt,values);
+            if l < nl
+                disp(sprintf('Removed: %2.0f',i));
             end
             fclose(fileID);
         end

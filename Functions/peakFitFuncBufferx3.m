@@ -11,6 +11,7 @@ function [ x_01,maximum1,fwhm1,x_02,maximum2,fwhm2,x_03,maximum3,fwhm3,x_0D,maxi
 % DprimePeakindex = fscanf(fileID,'%f,\n');
 % fclose(fileID);
 % DprimePeakindex = DprimePeakindex';
+% DprimePeakindex = load('../../Data/Defect Positions on Raman/x3_defect_positions.txt'); % for x3
 DprimePeakindex = [];
 % Initialize variables to save time in "for" loop
 numLayers = ones(1,size(y,2));
