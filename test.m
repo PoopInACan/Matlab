@@ -24,7 +24,7 @@ ls '/Users/kevme20/Box Sync/PhD/Experiment/Data/ReflectionMaps/*Ra*'
 clear;
 clc;
 % Find filename
-samplename = '3_xx';
+samplename = '5_xx';
 totalname = ['/Users/kevme20/Box Sync/PhD/Experiment/DataAnalysis/RamanTextFiles/*' samplename '*.txt'];
 %
 f = dir(totalname); % to find
@@ -49,6 +49,6 @@ refN = 1;
 fitsquest = 'Yes';
 saveFile = 'Yes';
 
-%%
+%
 Raman_fit_of_Buffer_layer_with_minimized_errors(filename,refN,fitsquest,saveFile)
 %%

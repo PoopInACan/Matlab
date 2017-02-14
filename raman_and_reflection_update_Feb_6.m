@@ -4,8 +4,8 @@ fig = figure(... % Create Figure, name it, position it
     'name','Reflection Mapping', ...
     'Units','normalized', ...
     'Position',[0.0153    0.0588    0.9766    0.8037]);
-ramanFileName = '2';
-matFile = dir(['../../Data/mat/*' ramanFileName '*']);
+ramanFileName = '';
+matFile = dir(['../../Data/mat/*' ramanFileName '*.mat']);
 if length(matFile) > 1
     names1 = struct2cell(matFile);
     [s,didSelectFile] = listdlg('PromptString','Select a Raman file:',...
@@ -35,6 +35,9 @@ if length(f) > 1
     if isequal(didSelectFile,0)
         disp('loading default map')
         fileDspot = 'ReflMap_xx19Ra_c-pwr_foc_Dspot.txt';
+        filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
+    else 
+        fileDspot = f(s).name;
         filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
     end
 else

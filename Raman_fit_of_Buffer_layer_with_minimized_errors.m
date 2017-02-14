@@ -34,7 +34,6 @@ end
 disp(['Importing file: ' filename ]);
  sz = size(yoriginal,2); 
  %%
- sz = 2705;
  estimatedSecondsToCompletion = sz*1.33;
  minutesToCompletion = floor(estimatedSecondsToCompletion/60);
  secondsToCompletion = floor(rem(estimatedSecondsToCompletion/60,minutesToCompletion)*60);

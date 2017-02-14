@@ -81,6 +81,17 @@ for i = 1:size(y,2)
         FitResults = num2cell(FitResults);
         [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{1,:});
         [~,x_0Dp(i),maximumDp(i),fwhmDp(i),~] = deal(FitResults{2,:});
+        if x_0Dp(i) < x_0G(i) % G and Dp peaks are swapped from FitResults
+           tempX = x_0G(i);
+           tempMax = maximumG(i);
+           tempfwhm = fwhmG(i);
+           x_0G(i) = x_0Dp(i);
+		   maximumG(i) = maximumDp(i);
+		   fwhmG(i) = fwhmDp(i);
+           x_0D(i) = tempX;
+		   maximumD(i) = tempMax;
+		   fwhmD(i) = tempfwhm;
+        end
 %       then D
         [FitResults,LowestError,baseline,BestStart,xi,yi] = ...
             peakfit(signal,1340,150,1,peakshape,extra,NumTrials,[1340 60],autozero,fixedparameters,plots,bipolar,5);
