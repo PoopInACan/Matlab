@@ -139,12 +139,8 @@ set(fig,'KeyPressFcn',@fig_Callback)
     function getMouseDownPosition(source,eventdata)
         handlegrid.gridpoints = importdata(filegridpoints);
         [eventdata.IntersectionPoint(1), eventdata.IntersectionPoint(2)];
-        %         xgrid = abs(handlegrid.gridpoints(:,1) - eventdata.IntersectionPoint(1));
         therep = repmat(eventdata.IntersectionPoint(1:2),[length(handlegrid.gridpoints(:,1)),1]);
         [aa, bb] = min(abs(handlegrid.gridpoints-therep));
-        %         [c1 indexX] = min(xgrid);
-        %         ygrid = abs(handlegrid.gridpoints(:,1) - eventdata.IntersectionPoint(2));
-        %         [c2 indexY] = min(ygrid);
         try
             sliderHandle.Value = bb(1)+bb(2)-1;
             pause(0.1);
@@ -161,11 +157,8 @@ set(fig,'KeyPressFcn',@fig_Callback)
         zM = Dspot.data(:,2);
         sizeOfMatrix = ceil(sqrt(length(xM)));
         xMatrix = reshape(xM,[sizeOfMatrix,sizeOfMatrix]);
-        %         xMatrix = flipud(xMatrix);
         yMatrix = reshape(yM,[sizeOfMatrix,sizeOfMatrix]);
-        %         yMatrix = fliplr(yMatrix);
         zMatrix = reshape(zM,[sizeOfMatrix,sizeOfMatrix]);
-        %         zMatrix = flipud(zMatrix);
         cc = contourf(reflectionAxes,xMatrix,yMatrix,zMatrix,'EdgeColor', 'none');
         contourmap = get(reflectionAxes,'Children');
         colorbar(reflectionAxes);
@@ -173,116 +166,6 @@ set(fig,'KeyPressFcn',@fig_Callback)
         cmax = 690;
         set(reflectionAxes,'XTickLabel','','YTickLabel','');
         set(contourmap,'PickableParts','all','ButtonDownFcn',@getMouseDownPosition);
-        %         %% Buffer Values computation
-        %         carbonBufferLayer = str2double(carbonBufferLayerTextControl.String);
-        %         if isequal(source.Tag,'carbonBufferLayerTag') % if input is base layer
-        %             % if user changes range, then it doesn't adjust automatically
-        %             layerRange = carbonBufferLayer*.017;
-        %             rangeOfBufferLayer.String = sprintf('%3f',layerRange/2);
-        %         elseif isequal(source.Tag,'carbonBufferLayerRange')
-        %             layerRange = str2double(source.String) * 2; % get range value typed by user and multiply by 2
-        %             source.String = sprintf(source.String); % redisplay it with +/-
-        %         else
-        %             layerRange = str2double(rangeOfBufferLayer.String) * 2;
-        %         end
-        %         % But if we have saved values, use these instead
-        %         if useMyControlledBufferValuesCheckbox.Value
-        %             switch fileDspot
-        %                 case 'ReflMap_xx22Ra_c-pwr_foc_Dspot.txt'
-        %                     carbonBufferLayer = 629.1;
-        %                     layerRange = 5.34735*2;
-        %                 case 'ReflMap_xx23Ra_c-pwr_foc_Dspot.txt'
-        %                     carbonBufferLayer = 629.15;
-        %                     layerRange = 5.34*2;
-        %                 case 'ReflMap_xx23Re_c-pwr_foc_Dspot.txt'
-        %                     carbonBufferLayer = 629.15;
-        %                     layerRange = 5.34*2;
-        %                 otherwise
-        %             end
-        %             carbonBufferLayerTextControl.String = sprintf('%.4g',carbonBufferLayer);
-        %             rangeOfBufferLayer.String = sprintf('%.3g',layerRange/2);
-        %
-        %         end
-        %         %%
-        %         minOutlier = carbonBufferLayer-layerRange*2;
-        %         %         putvar('minOutlier');
-        %         maxOutlier = 750;
-        %         %         minOutlier = 620;
-        %         numberOfHighOutliers = length(zM(zM>maxOutlier));
-        %         numberOfLowOutliers = length(zM(zM<minOutlier));
-        %         if numberOfHighOutliers > 0
-        %             disp([int2str(numberOfHighOutliers) ' values were too high'])
-        %         end
-        %         if numberOfLowOutliers > 0
-        %             disp([int2str(numberOfLowOutliers) ' values were too low'])
-        %         end
-        %         zM(zM>maxOutlier) = 610; % replace outliers with 600, below substrate power level
-        %         zM(zM<minOutlier) = 610; % replace outliers with 600
-        %         zOriginal = zM; % keep orignal z data before filling empty spots with the average
-        %         disbpoints = abs(xM(2)-xM(1));
-        %         nXsteps = (max(xM)-min(xM))/disbpoints;
-        %         nYsteps = (max(yM)-min(yM))/disbpoints;
-        %         if ~isequal(nXsteps,nYsteps)
-        %             bigSteps = max([nXsteps,nYsteps]);
-        %             [X, Y] = meshgrid(linspace(min(xM),max(xM),bigSteps+1), linspace(min(yM),max(yM),bigSteps+1));
-        %             yM = reshape(Y',[length(Y)^2,1]);
-        %             xM = reshape(X',[length(X)^2,1]);
-        %         end
-        %         sM = ceil(sqrt(length(xM)));
-        %
-        %         %         x = padarray(x,[s-x,0],610,'post');
-        %         zM = padarray(zM,[sM^2-length(zM),0],610,'post'); % if there isn't Z data for the whole map, fill it with average value of Z
-        %         %         putvar('z');
-        %         totalOutliers = numberOfHighOutliers + numberOfLowOutliers;
-        %         sizeOfMatrix = ceil(sqrt(length(xM)));
-        %         xMatrix = reshape(xM,[sizeOfMatrix,sizeOfMatrix]);
-        %         %         xMatrix = flipud(xMatrix);
-        %         yMatrix = reshape(yM,[sizeOfMatrix,sizeOfMatrix]);
-        %         %         yMatrix = fliplr(yMatrix);
-        %         zMatrix = reshape(zM,[sizeOfMatrix,sizeOfMatrix]);
-        %         %         zMatrix = flipud(zMatrix);
-        %         zM = zOriginal;
-        %         stepSize = 0.3*(sizeOfMatrix-1); % 0.3E-6 * steps taken
-        %         % Organizing layer minimums and maximums
-        %         layer1 			= carbonBufferLayer + layerRange;
-        %         layer2 			= layer1 + layerRange;
-        %         layer3 			= layer2 + layerRange;
-        %         nothingMin = carbonBufferLayer-layerRange*2;
-        %         carbonBufferMin = carbonBufferLayer;
-        %         carbonBufferMax = carbonBufferLayer + layerRange;
-        %         layer1Min = carbonBufferMax;
-        %         layer1Max = layer1 + layerRange;
-        %         layer2Min = layer1Max;
-        %         layer2Max = layer2 + layerRange;
-        %         layer3Min = layer2Max;
-        %         layer3Max = layer3 + layerRange;
-        %         % Getting percentage of power levels within ranges to determine how
-        %         % many layers it corresponds to
-        %         percNone = percentInRange2(zM,nothingMin,carbonBufferMin,totalOutliers); % percent lower than buffer layer
-        %         percZero = percentInRange2(zM,carbonBufferMin,carbonBufferMax,totalOutliers);
-        %         percSingle = percentInRange2(zM,layer1Min,layer1Max,totalOutliers);
-        %         percDouble = percentInRange2(zM,layer2Min,layer2Max,totalOutliers);
-        %         percTriple = percentInRange2(zM,layer3Min,layer3Max,totalOutliers);
-        %         percHOPG = percentInRange2(zM,layer3Max,1000,totalOutliers);
-        %         cc = contourf(reflectionAxes,xMatrix,yMatrix,zMatrix,'EdgeColor', 'none');
-        %         percentText = {sprintf([...
-        %             'No Layers: %.3g%%\n',...
-        %             '0 Layers: %.3g%%\n',...
-        %             '1 Layer: %.3g%%\n',...
-        %             '2 Layers: %.3g%%\n',...
-        %             '3 Layers: %.3g%%\n',...
-        %             'More than 3:  %.3g%%'],...
-        %             percNone, percZero, percSingle, percDouble, percTriple, percHOPG)};
-        %         hTitle = title(reflectionAxes,percentText);
-%         map = [    0.3333         0         0
-%             0.6667         0         0
-%             1.0000    0.6667         0
-%             1.0000    1.0000         0];
-%         colormap(map)
-        %                 colormap(hot)
-        %         contourmap = get(reflectionAxes,'Children');
-        %         set(reflectionAxes,'XTickLabel','','YTickLabel','');
-        %         set(contourmap,'PickableParts','all','ButtonDownFcn',@getMouseDownPosition);
         set(reflectionAxes, ...
             'Box'         , 'off'     , ...
             'CLim'        , [cmin cmax] , ...
@@ -335,11 +218,7 @@ set(fig,'KeyPressFcn',@fig_Callback)
                         plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i));
                 end
         end
-        % axis([1212 3348 -800 3600])
-        %                 xlim([1200 2000]);
-        %         hLegend = legend('Data','G','D','Dp','2D','Total');
-        %         text(1500,maximumG(i)/2,sprintf('%f',maximumD(i)/maximumG(i)));
-        %         set(hLegend,'Location','north')
+        legend('Original','G','D','Dp','2D','Total');
         title(ramanAxes,sprintf('%d',i));
         ylim(ramanAxes,[-1000,12000]);
         prettyPlotLoop(fig,14,'no')

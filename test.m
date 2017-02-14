@@ -24,7 +24,7 @@ ls '/Users/kevme20/Box Sync/PhD/Experiment/Data/ReflectionMaps/*Ra*'
 clear;
 clc;
 % Find filename
-samplename = '5_xx';
+samplename = '3_xx21';
 totalname = ['/Users/kevme20/Box Sync/PhD/Experiment/DataAnalysis/RamanTextFiles/*' samplename '*.txt'];
 %
 f = dir(totalname); % to find
