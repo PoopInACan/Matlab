@@ -182,48 +182,44 @@ set(fig,'KeyPressFcn',@fig_Callback)
                 lor2D = maximum1(i)*(1/2*fwhm1(i)).^2./( (x-x_01(i)).^2 + (1/2*fwhm1(i))^2);
                 switch layerNumber
                     case {'Yes',0}
-                        lor2D2 = maximum2(i)*(1/2*fwhm2(i)).^2./( (x-x_02(i)).^2 + (1/2*fwhm2(i))^2);
+                        lor2D4 = maximum2(i)*(1/2*fwhm2(i)).^2./( (x-x_02(i)).^2 + (1/2*fwhm2(i))^2);
                         lor2D3 = maximum3(i)*(1/2*fwhm3(i)).^2./( (x-x_03(i)).^2 + (1/2*fwhm3(i))^2);
                 end
         end
         switch showDprimePeak
-            case 'Yes' % D prime peaks
+            case 'Yes'
                 lorDp = maximumDp(i)*(1/2*fwhmDp(i)).^2./( (x-x_0Dp(i)).^2 + (1/2*fwhmDp(i))^2);
                 switch fitsquest
-                    case 'Yes' % Lorentzian fits and D prime peak
+                    case 'Yes'
                         plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
                             x(num),lorG(num), ...
                             x(num),lorD(num), ...
                             x(num),lorDp(num), ...
                             x(num),lor2D(num), ...
                             x(num),lorG(num)+lorD(num)+lorDp(num)+lor2D(num));
-                        legend('Original','G','D','Dp','2D','Total');
+                    otherwise
+                        plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
+                            x(num),lorDp(num));
                 end
-            otherwise % No D prime peaks
+            otherwise
                 switch fitsquest
                     case 'Yes'
                         switch layerNumber
-                            case {'Yes',0} % Lorentzian fits and three 2D peaks
-                                plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
-                                    x(num),lorG(num), ...
-                                    x(num),lorD(num), ...
-                                    x(num),lor2D(num), ...
-                                    x(num),lor2D2(num), ...
-                                    x(num),lor2D3(num), ...
-                                    x(num),lorG(num)+lorD(num)+lor2D(num)+lor2D2(num)+lor2D3(num));
-                                legend('Original','G','D','2D_1','2D_2','2D_3','Total');
-                            otherwise % Lorentzian fits and one 2D peaks
+                            case {'Yes',0}
+                                lor2D4 = maximum2(i)*(1/2*fwhm2(i)).^2./( (x-x_02(i)).^2 + (1/2*fwhm2(i))^2);
+                                lor2D3 = maximum3(i)*(1/2*fwhm3(i)).^2./( (x-x_03(i)).^2 + (1/2*fwhm3(i))^2);
+                            otherwise
                                 plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
                                     x(num),lorG(num), ...
                                     x(num),lorD(num), ...
                                     x(num),lor2D(num), ...
                                     x(num),lorG(num)+lorD(num)+lor2D(num));
-                                legend('Original','G','D','2D','Total');
                         end
-                    otherwise % no lorentzian fits
+                    otherwise
                         plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i));
                 end
         end
+        legend('Original','G','D','Dp','2D','Total');
         title(ramanAxes,sprintf('%d',i));
         ylim(ramanAxes,[-1000,12000]);
         prettyPlotLoop(fig,14,'no')

@@ -9,7 +9,15 @@ function [ x_01,maximum1,fwhm1,x_02,maximum2,fwhm2,x_03,maximum3,fwhm3,x_0D,maxi
 spectraToFitFor = load('../../Data/Defect Positions on Raman/934_defect_positions.txt');
 %% Initialize variables to save time in "for" loop
 numLayers = ones(1,size(y,2));
+x_0 = ones(1,size(y,2));
+maximum = ones(1,size(y,2));
+LowestError = ones(1,size(y,2));
+fwhm = ones(1,size(y,2));
+perc = ones(1,size(y,2));
 loopLength = length(numLayers);
+LowestErrorFirst = LowestError;
+xi = ones(600,size(y,2));
+yi = ones(600,size(y,2));
 x_0G = ones(1,size(y,2));
 maximumG = ones(1,size(y,2));
 fwhmG = ones(1,size(y,2));
@@ -19,15 +27,9 @@ fwhmD = ones(1,size(y,2));
 x_0Dp = ones(1,size(y,2));
 maximumDp = ones(1,size(y,2));
 fwhmDp = ones(1,size(y,2));
-fwhm1 = ones(1,size(y,2));
-maximum1 = ones(1,size(y,2));
-x_01 = ones(1,size(y,2));
-fwhm2 = ones(1,size(y,2));
-maximum2 = ones(1,size(y,2));
-x_02 = ones(1,size(y,2));
-fwhm3 = ones(1,size(y,2));
-maximum3 = ones(1,size(y,2));
-x_03 = ones(1,size(y,2));
+fwhm1
+maximum1
+x_01
 %% Set parameters for function called
 % "peakfit(signal,center,window,NumPeaks,peakshape,extra,NumTrials,start,autozero,fixedparameters,plots,bipolar,minwidth)"
 center2d = 2700;
@@ -42,35 +44,45 @@ fixedparameters = 2; % lorentzian is fixed, we don't want to fix anything else
 plots = 0; % show plots? 0 means no, 1 means yes
 bipolar = 0; % im not bipolar
 minwidth = 10; % minimum fwhm
-%% Fitting
+%%
 h = waitbar(0,'Initializing waitbar...');
 tic;
 switch layerNumber
     case {'Yes',0} % Buffer layer
-        for i = spectraToFitFor' % we only fit for this
+        for i = spectraToFitFor
             signal = [x',y(:,i)];
             % 2D peaks
-            [FitResults,~,~,~,~,~] = ...
-                peakfit(signal,2850,300,3,peakshape,extra,NumTrials,[2650 100 2950 70 3200 50],autozero,fixedparameters,plots,bipolar,minwidth);
+            [FitResults,LowestError,baseline,BestStart,xi,yi] = ...
+                peakfit(signal,center2d,window,NumPeaks,peakshape,extra,NumTrials,start2d,autozero,fixedparameters,plots,bipolar,minwidth);
             FitResults = num2cell(FitResults);
-            [~,x_01(i),maximum1(i),fwhm1(i),~] = deal(FitResults{1,:});
-            [~,x_02(i),maximum2(i),fwhm2(i),~] = deal(FitResults{2,:});
-            [~,x_03(i),maximum3(i),fwhm3(i),~] = deal(FitResults{3,:});
+            [~,x_01(i),maximum1(i),fwhm1(i),~] = deal(FitResults{:});
             % G and D together (for buffer layer)
-            [FitResults,~,~,~,~,~] = ...
+            [FitResults,LowestError,baseline,BestStart,xi,yi] = ...
                 peakfit(signal,1450,400,2,peakshape,extra,NumTrials,[1595 30 1360 60],autozero,fixedparameters,plots,bipolar,minwidth);
             FitResults = num2cell(FitResults);
             [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{1,:});
             [~,x_0D(i),maximumD(i),fwhmD(i),~] = deal(FitResults{2,:});
-%           G and D peak are swapped sometimes, so we check for this and
-%           swap them back
-            if x_0G(i) < x_0D(i)
+            % G and D peaks are swapped from FitResults, so we swap them
+            % back
+            if x_0D(i) < x_0G(i)
                 [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{2,:});
                 [~,x_0D(i),maximumD(i),fwhmD(i),~] = deal(FitResults{1,:});
             end
-            time_elapsed = toc;
-            time_left = time_elapsed*size(y,2)/i - time_elapsed;
-            h = waitbar(i/loopLength, h,['Time left for peak fit ' sprintf('%.2d',floor(time_left/60)) ':' sprintf('%.2d',floor(mod(time_left,60))) ]);
+            % Sometimes, D and G peak are on top of eachother, which is bad
+            % We check for this now and if they are, we increase the number
+            % of trys for the fit and pray that it fixes the problem
+            if 2*maximumD(i) > maximumG(i)
+                [FitResults,LowestError,baseline,BestStart,xi,yi] = ...
+                    peakfit(signal,1600,150,2,peakshape,extra,50,[1590 30 1360 60],autozero,fixedparameters,1,bipolar,5);
+                FitResults = num2cell(FitResults);
+                [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{1,:});
+                [~,x_0D(i),maximumDp(i),fwhmDp(i),~] = deal(FitResults{2,:});
+                % We have to check to see if the results are swapped again
+                if x_0D(i) < x_0G(i) % G and D peaks are swapped from FitResults
+                    [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{2,:});
+                    [~,x_0D(i),maximumDp(i),fwhmDp(i),~] = deal(FitResults{1,:});
+                end
+            end
         end
     case {'No',1} % as-grown monolayer, fit all spectra and special spectra to signal D' peak
         for i = 1:size(y,2)
@@ -122,10 +134,9 @@ switch layerNumber
             time_left = time_elapsed*size(y,2)/i - time_elapsed;
             h = waitbar(i/loopLength, h,['Time left for peak fit ' sprintf('%.2d',floor(time_left/60)) ':' sprintf('%.2d',floor(mod(time_left,60))) ]);
         end
-        %       These peaks are only used for buffer layer, since 2D peak has 3
-        %       peaks to fit for.
-        [x_02,maximum2,fwhm2] = deal(0);
-        [x_03,maximum3,fwhm3] = deal(0);
+        
+        [x_02,maximum2,fwhm2] = deal(0); 
+        [x_03,maximum3,fwhm3] = deal(0); 
 end
 
 

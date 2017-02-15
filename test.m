@@ -18,13 +18,13 @@
 % %%
 % figure(2);
 % plot(xfit,B(ind),xfit,data(ind,1))
-ls '/Users/kevme20/Box Sync/PhD/Experiment/DataAnalysis/RamanTextFiles/*';
-ls '/Users/kevme20/Box Sync/PhD/Experiment/Data/ReflectionMaps/*Ra*'
+% ls '/Users/kevme20/Box Sync/PhD/Experiment/DataAnalysis/RamanTextFiles/*';
+% ls '/Users/kevme20/Box Sync/PhD/Experiment/Data/ReflectionMaps/*Ra*'
 %%
 clear;
 clc;
 % Find filename
-samplename = '3_xx21';
+samplename = '934';
 totalname = ['/Users/kevme20/Box Sync/PhD/Experiment/DataAnalysis/RamanTextFiles/*' samplename '*.txt'];
 %
 f = dir(totalname); % to find
@@ -48,7 +48,8 @@ filename = [pathstr '/' name ext];
 refN = 1;
 fitsquest = 'Yes';
 saveFile = 'Yes';
+layerNumber = 0;
 
 %
-Raman_fit_of_Buffer_layer_with_minimized_errors(filename,refN,fitsquest,saveFile)
+Raman_fit_of_Buffer_layer_with_minimized_errors(filename,refN,fitsquest,saveFile,layerNumber)
 %%

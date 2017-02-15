@@ -170,6 +170,11 @@ set(sliderHandle,...
     'Max',max,...
     'SliderStep', [1/max , 1/max ]);
 end
+function [av,stdev] = getAvStd(index,data)
+    av = mean(data(index));
+    stdev = std(data(index));
+end
+
 % a = who;
 % ans=1;
 % putvar(a{:});
@@ -195,5 +200,6 @@ end
 %    std2DFWHM995
 % save('./Mat and text files/995average')
 % putvar('av2DFWHM' ,'av2DPOS'  ,'avGFWHM'  ,'avGPOS'   ,'stdGPOS'  ,'std2DPOS' ,'stdGFWHM' ,'std2DFWHM')
+
 
 end
