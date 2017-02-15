@@ -24,7 +24,7 @@
 clear;
 clc;
 % Find filename
-samplename = '934';
+samplename = '19';
 totalname = ['/Users/kevme20/Box Sync/PhD/Experiment/DataAnalysis/RamanTextFiles/*' samplename '*.txt'];
 %
 f = dir(totalname); % to find
@@ -46,8 +46,8 @@ end
 %
 filename = [pathstr '/' name ext];
 refN = 1;
-fitsquest = 'Yes';
-saveFile = 'Yes';
+fitsquest = 'Yes1';
+saveFile = 'Yes1';
 layerNumber = 0;
 
 %

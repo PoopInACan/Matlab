@@ -174,7 +174,7 @@ end
 
     function [data,yref] = flattenData(data,yref,x)
         %         flatIndex = find(x>2217 & x<2218); % bad
-        flatIndex = [];
+        flatIndex = find(x > 2800 & x < 3600);;
         %         flatIndex = find(x==2217);
         flatIndex2 = find(x > 2800 & x < 3600);
         flatIndexMonolayer = find(x > 2198 & x < 2200);
@@ -190,6 +190,7 @@ end
         yref_with_subtraction = ones(size(yref));
         data_with_subtraction = yref_with_subtraction;
         yfitref = medfilt1(yref([flatIndex flatIndex2],1),100);
+        [a_fit, sig_a, yy, chisqr] = pollsf(xfitref, yfitref', sigmaref', 3)
         [a_fitref, ~, ~, ~] = linreg(xfitref',yfitref,sigmaref);
         %         yyref = a_fitref(1) + a_fitref(2)*x;
         yyref =  a_fitref(2)*x;

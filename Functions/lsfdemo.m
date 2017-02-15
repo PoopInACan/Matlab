@@ -1,23 +1,20 @@
 % lsfdemo - Program for demonstrating least squares fit routines
-clc;
 clear all; help lsfdemo; % Clear memory and print header
 
 %* Initialize data to be fit. Data is quadratic plus random number.
-out1 = tgspcread('../../Data/Raman/xx10_xx20/xx10_xx20Ra_c-1.spc','Verbose','false');
-yReady = out1.Y;
-out2 = importdata('../../DataAnalysis/RamanTextFiles/y6HRef.txt');
-y = mean(out2,2)';
-
-x = importdata('../../DataAnalysis/RamanTextFiles/xAxis.txt');
-
-%%
-N = 2000;                 % Number of data points
-x = AngtoRamanShift(5318,x)'; % x = [1, 2, ..., N]
-alpha = 1;
+fprintf('Curve fit data is created using the quadratic\n');
+fprintf('  y(x) = c(1) + c(2)*x + c(3)*x^2 \n');
+c = input('Enter the coefficients as [c(1) c(2) c(3)]: ');
+N = 50;                 % Number of data points
+x = 1:N;                % x = [1, 2, ..., N]
+randn('state',0);       % Initialize random number generator
+alpha = input('Enter estimated error bar: ');
+r = alpha*randn(1,N);   % Gaussian distributed random vector
+y = c(1) + c(2)*x + c(3)*x.^2 + r;
 sigma = alpha*ones(1,N);    % Constant error bar
 
 %* Fit the data to a straight line or a more general polynomial
-M = 2;
+M = input('Enter number of fit parameters (=2 for line): ');
 if( M == 2 )  
   %* Linear regression (Straight line) fit
   [a_fit sig_a yy chisqr] = linreg(x,y,sigma);

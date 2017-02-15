@@ -2,13 +2,14 @@ clear;
 clc;
 close all force;
 %%
-ls './subtracted/'
-files = dir('./subtracted/*.sub');
+subfolder = '/Users/kevme20/Downloads/xx19_sub/';
+ls(subfolder);
+files = dir([subfolder '*.sub']);
 files = {files.name}.'
 files = sort_nat(files);
 %%
 for i = 1:length(files)
-    fileID = fopen(files{i},'r');
+    fileID = fopen([subfolder files{i}],'r');
     a = fscanf(fileID,'%f\t%f\n');
     fclose(fileID);
     x(:,i) = a(1:2:end);
@@ -16,5 +17,5 @@ for i = 1:length(files)
 end
 %%
 figure(1);clf;
-plot(x(:,1),y(:,1))
+plot(x(:,3),y(:,3))
 prettyPlotLoop(figure(1),14,'yes')
