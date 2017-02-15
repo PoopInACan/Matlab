@@ -1,7 +1,7 @@
 function indexOfDpositionSaved
 fig = figure(8);clf;
 % set(fig,'KeyPressFcn',@pressSpaceToSaveIndexToFile)
-addpath('../../Data/mat/*');
+addpath('../../Data/mat/');
 addpath('../../Data/Defect Positions on Raman/');
 matFile = dir('../../Data/mat/*.mat');
 if length(matFile) > 1
@@ -12,14 +12,15 @@ if length(matFile) > 1
     if isequal(didSelectFile,0) % if no mat file was selected, exit program
         disp('No Raman file was chosen');
         close all force;
-        return; 
+        return;
     end
     ramanFileName = names1{1,s};
     theVariables = load(['../../Data/mat/' ramanFileName]);
 end
-fitsquest = theVariables.fitsquest;
-defect_filename = '../../Data/Defect Positions on Raman/x3_defect_positions.txt';
-switch fitsquest
+showLorFit = theVariables.fitsquest;
+a = regexp(ramanFileName,'_','split');
+defect_filename = ['../../Data/Defect Positions on Raman/' a{1} '_defect_positions.txt'];
+switch showLorFit
     case 'Yes'
         fwhm1 = theVariables.fwhm1;
         fwhmD = theVariables.fwhmD;
@@ -31,8 +32,8 @@ switch fitsquest
         x_0D = theVariables.x_0D;
         x_0G = theVariables.x_0G;
 end
-theChoice = questdlg('Show D'' peak?','Show D'' peak?','Yes','No','No');
-switch theChoice
+showDPeak = questdlg('Show D'' peak?','Show D'' peak?','Yes','No','No');
+switch showDPeak
     case 'Yes'
         x_0Dp = theVariables.x_0Dp;
         maximumDp = theVariables.maximumDp;
@@ -87,16 +88,16 @@ disp('hi')
     function plotValueInTextBox(source,eventdata)
         i = floor(get(source,'Value'));
         num =find( x > 1189 & x < 3444 );
-        switch fitsquest
+        switch showLorFit
             case 'Yes'
                 lorG = maximumG(i)*(1/2*fwhmG(i)).^2./( (x-x_0G(i)).^2 + (1/2*fwhmG(i))^2);
                 lorD = maximumD(i)*(1/2*fwhmD(i)).^2./( (x-x_0D(i)).^2 + (1/2*fwhmD(i))^2);
                 lor2D = maximum1(i)*(1/2*fwhm1(i)).^2./( (x-x_01(i)).^2 + (1/2*fwhm1(i))^2);
         end
-        switch theChoice
+        switch showDPeak
             case 'Yes'
                 lorDp = maximumDp(i)*(1/2*fwhmDp(i)).^2./( (x-x_0Dp(i)).^2 + (1/2*fwhmDp(i))^2);
-                switch fitsquest
+                switch showLorFit
                     case 'Yes'
                         plot(x(num),y_shifted_flattened_subtracted(num,i), ...
                             x(num),lorG(num), ...
@@ -104,12 +105,9 @@ disp('hi')
                             x(num),lorDp(num), ...
                             x(num),lor2D(num), ...
                             x(num),lorG(num)+lorD(num)+lorDp(num)+lor2D(num));
-                    otherwise
-                        plot(x(num),y_shifted_flattened_subtracted(num,i), ...
-                            x(num),lorDp(num), ...
                 end
             otherwise
-                switch fitsquest
+                switch showLorFit
                     case 'Yes'
                         plot(x(num),y_shifted_flattened_subtracted(num,i), ...
                             x(num),lorG(num), ...
@@ -120,14 +118,17 @@ disp('hi')
                         plot(x(num),y_shifted_flattened_subtracted(num,i));
                 end
         end
-        % axis([1212 3348 -800 3600])
+        axis([1212 3348 -800 10000])
+        title(sprintf('%d',i));
+        prettyPlotLoop(figure(8),14,'no')
         %                 xlim([1200 2000]);
         %         hLegend = legend('Data','G','D','Dp','2D','Total');
         %         text(1500,maximumG(i)/2,sprintf('%f',maximumD(i)/maximumG(i)));
         %         set(hLegend,'Location','north')
-        title(sprintf('%d',i));
-        prettyPlotLoop(figure(8),14,'no')
     end
+
+
+
 
     function pressSpaceToSaveIndexToFile(source,eventdata)
         i = floor(get(sliderHandle,'Value'));
@@ -172,5 +173,5 @@ disp('hi')
             fclose(fileID);
         end
     end
-putvar('xv','yv','x','y')
+
 end
