@@ -35,27 +35,27 @@ x = importdata('../../DataAnalysis/RamanTextFiles/xAxis.txt');
 x = AngtoWavenumbers(5318,x);
 disp('Import data')
 %% Plot before manipulation
-figure(1);clf;
-plot(x,y_sample(:,1),x,y_reference(:,1))
-legend('Data','Reference')
-prettyPlotLoop(figure(1),14,'yes')
+% figure(1);clf;
+% plot(x,y_sample(:,1),x,y_reference(:,1))
+% legend('Data','Reference')
+% prettyPlotLoop(figure(1),14,'yes')
 %% Interpolate points
 tot = length(y_reference);
 y_reference = y_reference(tot:-1:1);
 y_sample = y_sample(tot:-1:1,:);
 xnew = linspace(x(1),x(end),5000);
-y_reference = interp1(x,y_reference,xnew,'spline');
+y_reference = interp1(x,y_reference,xnew,'linear');
 y_reference = y_reference';
-y_sample = interp1(x,y_sample,xnew,'spline');
+y_sample = interp1(x,y_sample,xnew,'linear');
 x = xnew;
 %% Plot after Interpolation of data points and reversal of x
-figure(2);clf;
-plot(xnew,y_sample(:,1),xnew,y_reference(:,1))
-axis('tight')
-legend('Data','Reference')
-prettyPlotLoop(figure(2),14,'yes')
+% figure(2);clf;
+% plot(xnew,y_sample(:,1),xnew,y_reference(:,1))
+% axis('tight')
+% legend('Data','Reference')
+% prettyPlotLoop(figure(2),14,'yes')
 %% Shift reference
-shiftn = 29;
+shiftn = 28;
 [~,ind] = find( x > 1100 & x < 1950);
 xfit = x(ind);
 for i = 1:size(y_sample,2)
@@ -75,7 +75,7 @@ y_sample = y_sample(1:(tlength-maxshift),:);
 sameIndex = find(x < 1400 & x > 1100);
 sameIndex2 = find(x > 1700 & x < 2400);
 sameIndex3 = find(x > 3370 & x < 3500);
-sameIndexTotal = [sameIndex sameIndex2];
+sameIndexTotal = [sameIndex sameIndex2 sameIndex3];
 x2 = x(sameIndexTotal);
 %% Plot sections of non-graphene spectra
 figure(3);clf;
@@ -93,7 +93,7 @@ for i = 1:size(y_sample,2)
     X2 = [forX2 y_reference(:,i)];
     a = X\y_sample(sameIndexTotal,i);
     y_reference_new(:,i) = X2*a;
-    ynew(:,i) = abs(y_sample(:,i)-X2*a);
+    ynew(:,i) = y_sample(:,i)-X2*a;
 end
 %% open vallery files
 subfolder = '/Users/kevme20/Downloads/xx19_sub/';
@@ -110,7 +110,7 @@ for i = 1:length(files)
     yv(:,i) = av(2:2:end);
 end
 %% Plot my spectra vs vallery
-n=51
+n=85
 figure(5);clf;
 plot(x,ynew(:,n),xv(:,n),yv(:,n))
 legend('mine1','vallery')

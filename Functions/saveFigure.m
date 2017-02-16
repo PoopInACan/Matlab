@@ -6,7 +6,7 @@ function saveFigure(figure_handle,file_name,type,PathName)
 % type => '-dpng' or '-depsc'
 % PathName = '/Users/Kevin/Documents/OneDrive/Linkoping/PhD/Raman maps/Figures/pngFigures/'
 if nargin < 4
-   PathName = '/Users/kevme20/Documents/OneDrive/Linkoping/PhD/Raman maps/Figures/pngFigures/'; 
+   PathName = '/Users/kevme20/Box Sync/PhD/Experiment/Outputs/Presentationpng/'; 
 end
 if nargin < 3
     type = '-dpng';
@@ -16,15 +16,16 @@ if nargin < 2
     type = '-dpng';
 end
 set(figure_handle, 'PaperPositionMode', 'auto');
-if isequal(type,'-dpng')
+switch type
+    case {'-dpng','dpng','png'}
     [FileName,PathName,FilterIndex] = uiputfile('*.png','Pick file name',[PathName file_name]);
-elseif isequal(type,'-depsc')
+    type = 'dpng';
+    case {'-depsc','eps','epsc','deps','depsc'}
     [FileName,PathName,FilterIndex] = uiputfile('*.eps','Pick file name',[PathName file_name]);
-
+    type = 'depsc';
 end
 if isequal(FileName,0)
     disp('Cancelled save figure');
 else
-    print(figure_handle, type,  [PathName FileName])
-
+    print(figure_handle,[PathName FileName], type  )
 end
