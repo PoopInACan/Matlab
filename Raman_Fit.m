@@ -54,16 +54,16 @@ plot(xnew,y_sample(:,1),xnew,y_reference(:,1))
 axis('tight')
 legend('Data','Reference')
 prettyPlotLoop(figure(2),14,'yes')
-
-%%
-[~,ind] = find( x > 1150 & x < 1950);
+%% Shift reference
+shiftn = 29;
+[~,ind] = find( x > 1100 & x < 1950);
 xfit = x(ind);
 for i = 1:size(y_sample,2)
     for j = 1:60
         sums(j) = sum((y_reference(ind+j-31)-y_sample(ind,i)).^2);
     end
-    [val,ind2]=min(sums);
-    shiftnumber(i) = -1*(ind2-31);
+    [val,ind2]=min(abs(sums));
+    shiftnumber(i) = -1*(ind2-shiftn);
 end
 y_reference = circshift(repmat(y_reference,[1,size(y_sample,2)]),shiftnumber);
 maxshift = max(abs(shiftnumber));
@@ -75,7 +75,7 @@ y_sample = y_sample(1:(tlength-maxshift),:);
 sameIndex = find(x < 1400 & x > 1100);
 sameIndex2 = find(x > 1700 & x < 2400);
 sameIndex3 = find(x > 3370 & x < 3500);
-sameIndexTotal = [sameIndex sameIndex2 sameIndex3];
+sameIndexTotal = [sameIndex sameIndex2];
 x2 = x(sameIndexTotal);
 %% Plot sections of non-graphene spectra
 figure(3);clf;
@@ -83,12 +83,25 @@ plot(x2,y_sample(sameIndexTotal),'.',x2,y_reference(sameIndexTotal),'.')
 axis('tight')
 legend('Data','Reference')
 prettyPlotLoop(figure(2),14,'yes')
-%% open vallery
+%% Subtract reference from sample
+forX = [ones(length(x2),1) x2' x2'.^2]; % a0 + a1*x + a2*x^2 + a3*reference
+forX2 = [ones(length(x),1) x' x'.^2];
+ynew = zeros(size(y_sample));
+y_reference_new = zeros(size(y_reference));
+for i = 1:size(y_sample,2)
+    X = [forX y_reference(sameIndexTotal,i)];
+    X2 = [forX2 y_reference(:,i)];
+    a = X\y_sample(sameIndexTotal,i);
+    y_reference_new(:,i) = X2*a;
+    ynew(:,i) = abs(y_sample(:,i)-X2*a);
+end
+%% open vallery files
 subfolder = '/Users/kevme20/Downloads/xx19_sub/';
 ls(subfolder);
 files = dir([subfolder '*.sub']);
 files = {files.name}.';
 files = sort_nat(files);
+%
 for i = 1:length(files)
     fileID = fopen([subfolder files{i}],'r');
     av = fscanf(fileID,'%f\t%f\n');
@@ -96,18 +109,10 @@ for i = 1:length(files)
     xv(:,i) = av(1:2:end);
     yv(:,i) = av(2:2:end);
 end
-%% Plot my spectrum vs vallery
-n = 1;
-X = [ones(length(x2),1) x2' x2'.^2 y_reference(sameIndexTotal,n)];
-X2 = [ones(length(x),1) x' x'.^2 y_reference(:,n)];
-a = X\y_sample(sameIndexTotal,n);
+%% Plot my spectra vs vallery
+n=51
 figure(5);clf;
-plot(x,y_sample(:,n)-X2*a,xv(:,n),yv(:,n))
-legend('mine','vallery')
-% xlim([1400 1800])
+plot(x,ynew(:,n),xv(:,n),yv(:,n))
+legend('mine1','vallery')
+xlim([1400 1800])
 prettyPlotLoop(figure(5),14,'yes')
-%%
-sigma = ones(1,length(x2));
-%%
-[a_fit, sig_a, yy, chisqr] = pollsf(x2, y_sample(sameIndexTotal,n)', sigma, 3)
-%%
