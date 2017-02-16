@@ -16,8 +16,8 @@ for i = 1:length(allobj)
             for j = 1:length(allobj(i))
                 if isequal(allobj(i).Marker,'o') | isequal(allobj(i).Marker,'^' | isequal(allobj(i).Marker,'.'))
                     set(allobj(i), ...
-                        'LineWidth'       , 3           , ...            
-                        'MarkerSize'      , 15            );
+                        'LineWidth'       , 1           , ...            
+                        'MarkerSize'      , 10            );
                 else
                     set(allobj(i), 'LineWidth', 2);
                 end

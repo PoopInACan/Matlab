@@ -19,10 +19,10 @@ set(figure_handle, 'PaperPositionMode', 'auto');
 switch type
     case {'-dpng','dpng','png'}
     [FileName,PathName,FilterIndex] = uiputfile('*.png','Pick file name',[PathName file_name]);
-    type = 'dpng';
+    type = '-dpng';
     case {'-depsc','eps','epsc','deps','depsc'}
     [FileName,PathName,FilterIndex] = uiputfile('*.eps','Pick file name',[PathName file_name]);
-    type = 'depsc';
+    type = '-depsc';
 end
 if isequal(FileName,0)
     disp('Cancelled save figure');
