@@ -43,12 +43,12 @@ disp('Import data')
 tot = length(y_reference);
 y_reference = y_reference(tot:-1:1);
 y_sample = y_sample(tot:-1:1,:);
-xnew = linspace(x(1),x(end),5000);
+xnew = linspace(x(1),x(end),20000);
 
 y_reference = interp1(x,y_reference,xnew,'linear');
 y_reference = y_reference';
-y_sample = interp1(x,y_sample,xnew,'linear');
-x = xnew;
+% y_sample = interp1(x,y_sample,xnew,'linear');
+% x = xnew;x
 %% Plot after Interpolation of data points and reversal of x
 % figure(2);clf;
 % plot(xnew,y_sample(:,1),xnew,y_reference(:,1))
@@ -57,7 +57,7 @@ x = xnew;
 % prettyPlotLoop(figure(2),14,'yes')
 %% Shift reference
 shiftn = 27;
-ind = find( x > 1442 & x < 1532);
+[ind,] = find( x > 1442 & x < 1532);
 % [~,ind2] = find(x > 1700 & x < 2350);
 xfit = x(ind);
 for i = 1:size(y_sample,2)
@@ -100,6 +100,7 @@ for i = 1:size(y_sample,2)
 end
 %% open vallery files
 subfolder = '/Users/kevme20/Downloads/xx19_sub/';
+ls(subfolder);
 files = dir([subfolder '*.sub']);
 files = {files.name}.';
 files = sort_nat(files);
@@ -119,4 +120,4 @@ figure(5);clf;
 plot(x,ynew(:,n),xv(:,n),yv(:,n))
 legend('mine1','vallery')
 xlim([1400 1800])
-prettyPlotLoop(figure(5),14,'yes')
+% prettyPlotLoop(figure(5),14,'yes')
