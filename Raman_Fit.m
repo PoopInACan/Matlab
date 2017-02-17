@@ -62,7 +62,7 @@ ind = find( x > 1442 & x < 1532);
 xfit = x(ind);
 for i = 1:size(y_sample,2)
     for j = 1:60
-        sums(j) = sum((y_reference(ind+j-31)-y_sample(ind,i)).^2);
+        sums(j) = sum((y_reference(ind+j-shiftn)-y_sample(ind,i)).^2);
     end
     [val,ind2]=min(sums);
     shiftnumber(i) = -1*(ind2-shiftn);
