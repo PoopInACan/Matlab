@@ -43,68 +43,68 @@ disp('Import data')
 tot = length(y_reference);
 y_reference = y_reference(tot:-1:1);
 y_sample = y_sample(tot:-1:1,:);
-xnew = linspace(x(1),x(end),20000);
+xnew = linspace(x(1),x(end),4000);
 
-y_reference = interp1(x,y_reference,xnew,'linear');
+y_reference = interp1(x,y_reference,xnew,'spline');
 y_reference = y_reference';
-% y_sample = interp1(x,y_sample,xnew,'linear');
-% x = xnew;x
+y_sample = interp1(x,y_sample,xnew,'spline');
+x = xnew;
 %% Plot after Interpolation of data points and reversal of x
 % figure(2);clf;
 % plot(xnew,y_sample(:,1),xnew,y_reference(:,1))
 % axis('tight')
 % legend('Data','Reference')
 % prettyPlotLoop(figure(2),14,'yes')
-%% Shift reference
-shiftn = 27;
-[ind,] = find( x > 1442 & x < 1532);
-% [~,ind2] = find(x > 1700 & x < 2350);
-xfit = x(ind);
-for i = 1:size(y_sample,2)
-    for j = 1:60
-        sums(j) = sum((y_reference(ind+j-31)-y_sample(ind,i)).^2);
-    end
-    [val,ind2]=min(sums);
-    shiftnumber(i) = -1*(ind2-shiftn);
-end
-y_reference = circshift(repmat(y_reference,[1,size(y_sample,2)]),shiftnumber);
-maxshift = max(abs(shiftnumber));
-tlength = length(y_reference);
-y_reference = y_reference(1:(tlength-maxshift),:);
-x = x(1:(tlength-maxshift));
-y_sample = y_sample(1:(tlength-maxshift),:);
 %% Find sections where graphene spectra isn't present
-
-sameIndex = find(x < 1000 & x > 1200);
-sameIndex2 = find(x > 1650 & x < 2400);
-sameIndex3 = find(x > 3370 & x < 3700);
+k = 60;
+sameIndex = find(x < 1200 & x > 1100);
+sameIndex2 = find(x > 1700 & x < 2350);
+sameIndex3 = find(x > 3370 & x < 3600);
 sameIndexTotal = [sameIndex sameIndex2 sameIndex3];
+
+
 x_nonGrapheneSpectra = x(sameIndexTotal);
-%% Plot sections of non-graphene spectra
-figure(3);clf;
-plot(x_nonGrapheneSpectra,y_sample(sameIndexTotal),'.',x_nonGrapheneSpectra,y_reference(sameIndexTotal),'.')
-axis('tight')
-legend('Data','Reference')
-prettyPlotLoop(figure(2),14,'yes')
-%% Subtract reference from sample
+y_shifted_reference = zeros(length(sameIndexTotal),k);
+y_reference_new_nongraphene = zeros(length(sameIndexTotal),k);
+y_sample_new_nongraphene = zeros(length(sameIndexTotal),k);
+a = zeros(4,k);
+%% Create Matrices for fitting
 forX = [ones(length(x_nonGrapheneSpectra),1) x_nonGrapheneSpectra' x_nonGrapheneSpectra'.^2]; % a0 + a1*x + a2*x^2 + a3*reference
 forX2 = [ones(length(x),1) x' x'.^2];
-ynew = zeros(size(y_sample));
-y_reference_new = zeros(size(y_reference));
+y_sample_new = zeros(size(y_sample));
+%% Shift reference and subtract and find best combination of the two
+
+shiftn = 31;
+ind = find( x > 1442 & x < 1532); % indices of special spot we want to fit
 for i = 1:size(y_sample,2)
-    X = [forX y_reference(sameIndexTotal,i)];
-    X2 = [forX2 y_reference(:,i)];
-    a = X\y_sample(sameIndexTotal,i);
-    y_reference_new(:,i) = X2*a;
-    ynew(:,i) = y_sample(:,i)-X2*a;
+    for j = 1:k
+        y_shifted_reference(:,j) = y_reference(sameIndexTotal-shiftn+j);
+        X = [forX y_shifted_reference(:,j)]; % matrix of non graphene spectra
+        a(:,j) = X\y_sample(sameIndexTotal,i);
+        y_reference_new_nongraphene(:,j) = X*a(:,j);
+        y_sample_new_nongraphene(:,j) = y_sample(sameIndexTotal,i) - y_reference_new_nongraphene(:,j); % minimize this
+    end
+    [val,indOfMinShift] = min(sum(abs(y_sample_new_nongraphene)));
+    yrr=circshift(y_reference,-1*indOfMinShift+shiftn); % circshift yref
+    X2 = [forX2 yrr]; % matrix of total graphene spectra
+    y_reference_new = X2*a(:,indOfMinShift);
+    y_sample_new(:,i) = y_sample(:,i) - y_reference_new;
 end
+y_sample = y_sample_new;
+% y_reference = circshift(repmat(y_reference,[1,size(y_sample,2)]),shiftnumber);
+% maxshift = max(abs(shiftnumber));
+% tlength = length(y_reference);
+% y_reference = y_reference(1:(tlength-maxshift),:);
+% x = x(1:(tlength-maxshift));
+% y_sample = y_sample(1:(tlength-maxshift),:);
+
 %% open vallery files
 subfolder = '/Users/kevme20/Downloads/xx19_sub/';
-ls(subfolder);
 files = dir([subfolder '*.sub']);
 files = {files.name}.';
 files = sort_nat(files);
-%
+xv = zeros(2000,length(files));
+yv = zeros(2000,length(files));
 for i = 1:length(files)
     fileID = fopen([subfolder files{i}],'r');
     av = fscanf(fileID,'%f\t%f\n');
@@ -113,11 +113,13 @@ for i = 1:length(files)
     yv(:,i) = av(2:2:end);
 end
 
-
 %% Plot my spectra vs vallery
-n = 85;
+n = 2;
 figure(5);clf;
-plot(x,ynew(:,n),xv(:,n),yv(:,n))
+plot(x,y_sample_new(:,n))
+hold on;
+% plot(xv(:,n),yv(:,n))
 legend('mine1','vallery')
 xlim([1400 1800])
-% prettyPlotLoop(figure(5),14,'yes')
+hold off;
+prettyPlotLoop(figure(5),14,'yes')

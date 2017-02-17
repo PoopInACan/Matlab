@@ -43,11 +43,11 @@ disp('Import data')
 tot = length(y_reference);
 y_reference = y_reference(tot:-1:1);
 y_sample = y_sample(tot:-1:1,:);
-xnew = linspace(x(1),x(end),20000);
+xnew = linspace(x(1),x(end),4000);
 
-y_reference = interp1(x,y_reference,xnew,'linear');
+y_reference = interp1(x,y_reference,xnew,'spline');
 y_reference = y_reference';
-y_sample = interp1(x,y_sample,xnew,'linear');
+y_sample = interp1(x,y_sample,xnew,'spline');
 x = xnew;
 %% Plot after Interpolation of data points and reversal of x
 % figure(2);clf;
@@ -61,6 +61,8 @@ sameIndex = find(x < 1200 & x > 1100);
 sameIndex2 = find(x > 1700 & x < 2350);
 sameIndex3 = find(x > 3370 & x < 3600);
 sameIndexTotal = [sameIndex sameIndex2 sameIndex3];
+
+
 x_nonGrapheneSpectra = x(sameIndexTotal);
 y_shifted_reference = zeros(length(sameIndexTotal),k);
 y_reference_new_nongraphene = zeros(length(sameIndexTotal),k);
@@ -70,7 +72,6 @@ a = zeros(4,k);
 forX = [ones(length(x_nonGrapheneSpectra),1) x_nonGrapheneSpectra' x_nonGrapheneSpectra'.^2]; % a0 + a1*x + a2*x^2 + a3*reference
 forX2 = [ones(length(x),1) x' x'.^2];
 y_sample_new = zeros(size(y_sample));
-% y_reference_new = zeros(size(y_reference));
 %% Shift reference and subtract and find best combination of the two
 
 shiftn = 31;
@@ -97,13 +98,6 @@ y_sample = y_sample_new;
 % x = x(1:(tlength-maxshift));
 % y_sample = y_sample(1:(tlength-maxshift),:);
 
-%% Plot sections of non-graphene spectra
-% figure(3);clf;
-% plot(x_nonGrapheneSpectra,y_sample(sameIndexTotal),'.',x_nonGrapheneSpectra,y_reference(sameIndexTotal),'.')
-% axis('tight')
-% legend('Data','Reference')
-% prettyPlotLoop(figure(2),14,'yes')
-
 %% open vallery files
 subfolder = '/Users/kevme20/Downloads/xx19_sub/';
 files = dir([subfolder '*.sub']);
@@ -124,8 +118,8 @@ n = 2;
 figure(5);clf;
 plot(x,y_sample_new(:,n))
 hold on;
-plot(xv(:,n),yv(:,n))
+% plot(xv(:,n),yv(:,n))
 legend('mine1','vallery')
-% xlim([1400 1800])
+xlim([1400 1800])
 hold off;
 prettyPlotLoop(figure(5),14,'yes')
