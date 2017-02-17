@@ -58,17 +58,28 @@ y_reference = y_reference';
 % legend('Data','Reference')
 % prettyPlotLoop(figure(2),14,'yes')
 %% Shift reference
+<<<<<<< HEAD
 shiftn = 27;
 [~,ind1] = find( x > 1442 & x < 1532);
 % [~,ind2] = find(x > 1700 & x < 2350);
 ind3 = ind1 ;
 xfit = x(ind3);
+=======
+shiftn = 28;
+[~,ind] = find( x > 1100 & x < 1950);
+xfit = x(ind);
+>>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
 for i = 1:size(y_sample,2)
     for j = 1:60
-        sums(j) = sum((y_reference(ind3+j-31)-y_sample(ind3,i)).^2);
+        sums(j) = sum((y_reference(ind+j-31)-y_sample(ind,i)).^2);
     end
+<<<<<<< HEAD
     [val,ind2]=min(sums);
     shiftnumber(i) = -1*(ind3-shiftn);
+=======
+    [val,ind2]=min(abs(sums));
+    shiftnumber(i) = -1*(ind2-shiftn);
+>>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
 end
 y_reference = circshift(repmat(y_reference,[1,size(y_sample,2)]),shiftnumber);
 maxshift = max(abs(shiftnumber));
@@ -77,9 +88,15 @@ y_reference = y_reference(1:(tlength-maxshift),:);
 x = x(1:(tlength-maxshift));
 y_sample = y_sample(1:(tlength-maxshift),:);
 %% Find sections where graphene spectra isn't present
+<<<<<<< HEAD
 sameIndex = find(x < 1000 & x > 1200);
 sameIndex2 = find(x > 1650 & x < 2400);
 sameIndex3 = find(x > 3370 & x < 3700);
+=======
+sameIndex = find(x < 1400 & x > 1100);
+sameIndex2 = find(x > 1700 & x < 2400);
+sameIndex3 = find(x > 3370 & x < 3500);
+>>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
 sameIndexTotal = [sameIndex sameIndex2 sameIndex3];
 x_nonGrapheneSpectra = x(sameIndexTotal);
 %% Plot sections of non-graphene spectra
@@ -102,6 +119,7 @@ for i = 1:size(y_sample,2)
 end
 %% open vallery files
 subfolder = '/Users/kevme20/Downloads/xx19_sub/';
+ls(subfolder);
 files = dir([subfolder '*.sub']);
 files = {files.name}.';
 files = sort_nat(files);
@@ -119,10 +137,7 @@ end
 %% Plot my spectra vs vallery
 n = 85;
 figure(5);clf;
-plot(x,ynew(:,n))
-hold on;
-% plot(xv(:,n),yv(:,n))
+plot(x,ynew(:,n),xv(:,n),yv(:,n))
 legend('mine1','vallery')
-hold off;
 xlim([1400 1800])
 % prettyPlotLoop(figure(5),14,'yes')
