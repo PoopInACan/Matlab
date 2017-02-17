@@ -6,7 +6,8 @@ function [ x_01,maximum1,fwhm1,x_02,maximum2,fwhm2,x_03,maximum3,fwhm3,x_0D,maxi
 % DprimePeakindex = [35,36,37,38,39,52,53,54,55,69,70,86]; % for x947
 % DprimePeakindex = load('../../Data/Defect Positions on Raman/x949_defect_positions.txt'); % for x949
 % DprimePeakindex = load('../../Data/Defect Positions on Raman/x3_defect_positions.txt'); % for x3
-spectraToFitFor = load('../../Data/Defect Positions on Raman/934_defect_positions.txt');
+% spectraToFitFor = load('../../Data/Defect Positions on Raman/934_defect_positions.txt');
+spectraToFitFor = []; % for monolayer or buffer samples where all spectra need to be fit
 %% Initialize variables to save time in "for" loop
 numLayers = ones(1,size(y,2));
 loopLength = length(numLayers);
@@ -46,7 +47,7 @@ minwidth = 10; % minimum fwhm
 h = waitbar(0,'Initializing waitbar...');
 tic;
 switch layerNumber
-    case {'Yes',0} % Buffer layer
+    case {'Yes',0, 'Buffer'} % Buffer layer
         for i = spectraToFitFor' % we only fit for this
             signal = [x',y(:,i)];
             % 2D peaks
@@ -72,7 +73,8 @@ switch layerNumber
             time_left = time_elapsed*size(y,2)/i - time_elapsed;
             h = waitbar(i/loopLength, h,['Time left for peak fit ' sprintf('%.2d',floor(time_left/60)) ':' sprintf('%.2d',floor(mod(time_left,60))) ]);
         end
-    case {'No',1} % as-grown monolayer, fit all spectra and special spectra to signal D' peak
+    case {'No',1,'Mono'} % as-grown monolayer, fit all spectra and special spectra to signal D' peak
+        % spectraToFitFor is for D' peak
         for i = 1:size(y,2)
             signal = [x',y(:,i)];
             % 2D peaks
@@ -103,7 +105,7 @@ switch layerNumber
                 end
                 if 2*maximumDp(i) > maximumG(i)
                     [FitResults,LowestError,baseline,BestStart,xi,yi] = ...
-                        peakfit(signal,1600,150,2,peakshape,extra,50,[1590 30 1624 20],autozero,fixedparameters,1,bipolar,5);
+                        peakfit(signal,1600,150,2,peakshape,extra,50,[1590 30 1624 20],autozero,fixedparameters,0,bipolar,5);
                     FitResults = num2cell(FitResults);
                     [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{1,:});
                     [~,x_0Dp(i),maximumDp(i),fwhmDp(i),~] = deal(FitResults{2,:});

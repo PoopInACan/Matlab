@@ -1,5 +1,4 @@
 function raman_and_reflection_update_Feb_6
-close all force
 fig = figure(... % Create Figure, name it, position it
     'NumberTitle','off', ...
     'name','Reflection Mapping', ...
@@ -84,21 +83,17 @@ switch fitsquest
                 x_03 = theVariables.x_03;
         end
 end
-
+showDprimePeak = questdlg('Show D'' peak?','Show D'' peak?','Yes','No','No');
+switch showDprimePeak
+    case 'Yes'
         x_0Dp = theVariables.x_0Dp;
         maximumDp = theVariables.maximumDp;
         fwhmDp = theVariables.fwhmDp;
-if isequal(x_0Dp,ones(1,length(x_0Dp)))
-    showDprimePeak = 'No';
-else
-    showDprimePeak = 'Yes';
+    otherwise
 end
-    
-
 %% Load variables from mat file
 x = theVariables.x;
 y = theVariables.y;
-y_shifted_flattened_subtracted = y;
 % y_shifted = theVariables.y_shifted;
 % y_shifted_flattened = theVariables.y_shifted_flattened;
 % y_shifted_flattened_subtracted = theVariables.y_shifted_flattened_subtracted;
@@ -230,7 +225,6 @@ set(fig,'KeyPressFcn',@fig_Callback)
                 end
         end
         title(ramanAxes,sprintf('%d',i));
-        xlim([1400 1700])
         ylim(ramanAxes,[-1000,12000]);
         prettyPlotLoop(fig,14,'no')
     end
