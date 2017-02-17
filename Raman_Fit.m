@@ -59,6 +59,7 @@ y_reference = y_reference';
 % prettyPlotLoop(figure(2),14,'yes')
 %% Shift reference
 <<<<<<< HEAD
+<<<<<<< HEAD
 shiftn = 27;
 [~,ind1] = find( x > 1442 & x < 1532);
 % [~,ind2] = find(x > 1700 & x < 2350);
@@ -69,14 +70,22 @@ shiftn = 28;
 [~,ind] = find( x > 1100 & x < 1950);
 xfit = x(ind);
 >>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
+=======
+shiftn = 28;
+[~,ind] = find( x > 1100 & x < 1950);
+xfit = x(ind);
+>>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
 for i = 1:size(y_sample,2)
     for j = 1:60
         sums(j) = sum((y_reference(ind+j-31)-y_sample(ind,i)).^2);
     end
 <<<<<<< HEAD
+<<<<<<< HEAD
     [val,ind2]=min(sums);
     shiftnumber(i) = -1*(ind3-shiftn);
 =======
+=======
+>>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
     [val,ind2]=min(abs(sums));
     shiftnumber(i) = -1*(ind2-shiftn);
 >>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
@@ -89,9 +98,15 @@ x = x(1:(tlength-maxshift));
 y_sample = y_sample(1:(tlength-maxshift),:);
 %% Find sections where graphene spectra isn't present
 <<<<<<< HEAD
+<<<<<<< HEAD
 sameIndex = find(x < 1000 & x > 1200);
 sameIndex2 = find(x > 1650 & x < 2400);
 sameIndex3 = find(x > 3370 & x < 3700);
+=======
+sameIndex = find(x < 1400 & x > 1100);
+sameIndex2 = find(x > 1700 & x < 2400);
+sameIndex3 = find(x > 3370 & x < 3500);
+>>>>>>> parent of f858f2b... Save before attempt to combine shift and subtraction
 =======
 sameIndex = find(x < 1400 & x > 1100);
 sameIndex2 = find(x > 1700 & x < 2400);
