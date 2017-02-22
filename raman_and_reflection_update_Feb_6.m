@@ -37,7 +37,7 @@ if length(f) > 1 % if there is more then one map related to title, allow user to
         disp('loading default map')
         fileDspot = 'ReflMap_xx19Ra_c-pwr_foc_Dspot.txt';
         filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
-    else 
+    else
         fileDspot = f(s).name;
         filegridpoints = strrep(fileDspot,'pwr_foc_Dspot','grid_pnts');
     end
@@ -63,7 +63,7 @@ if isequal(length(f),1)
 end
 
 switch fitsquest
-    case 'Yes'
+    case {'Yes','yes'}
         fwhm1 = theVariables.fwhm1;
         fwhmD = theVariables.fwhmD;
         fwhmG = theVariables.fwhmG;
@@ -75,7 +75,7 @@ switch fitsquest
         x_0G = theVariables.x_0G;
         layerNumber = theVariables.layerNumber;
         switch layerNumber
-            case {'Yes',0}
+            case {'Yes','yes',0, 'Buffer','buffer'} % means that it is buffer layer
                 fwhm2 = theVariables.fwhm2;
                 maximum2 = theVariables.maximum2;
                 x_02 = theVariables.x_02;
@@ -85,15 +85,15 @@ switch fitsquest
         end
 end
 
-        x_0Dp = theVariables.x_0Dp;
-        maximumDp = theVariables.maximumDp;
-        fwhmDp = theVariables.fwhmDp;
+x_0Dp = theVariables.x_0Dp;
+maximumDp = theVariables.maximumDp;
+fwhmDp = theVariables.fwhmDp;
 if isequal(x_0Dp,ones(1,length(x_0Dp)))
     showDprimePeak = 'No';
 else
     showDprimePeak = 'Yes';
 end
-    
+
 
 %% Load variables from mat file
 x = theVariables.x;
@@ -174,19 +174,19 @@ set(fig,'KeyPressFcn',@fig_Callback)
             'XColor'      , [.3 .3 .3], ...
             'YColor'      , [.3 .3 .3], ...
             'LineWidth'   , 1         );
-
+        
     end
 
     function plotValueInTextBox(source,eventdata)
         i = floor(get(source,'Value'));
         num =find( x > 1189 & x < 3444 );
         switch fitsquest
-            case 'Yes'
+            case {'Yes','yes'}
                 lorG = maximumG(i)*(1/2*fwhmG(i)).^2./( (x-x_0G(i)).^2 + (1/2*fwhmG(i))^2);
                 lorD = maximumD(i)*(1/2*fwhmD(i)).^2./( (x-x_0D(i)).^2 + (1/2*fwhmD(i))^2);
                 lor2D = maximum1(i)*(1/2*fwhm1(i)).^2./( (x-x_01(i)).^2 + (1/2*fwhm1(i))^2);
                 switch layerNumber
-                    case {'Yes',0}
+                    case {'Yes','yes',0, 'Buffer','buffer'} 
                         lor2D2 = maximum2(i)*(1/2*fwhm2(i)).^2./( (x-x_02(i)).^2 + (1/2*fwhm2(i))^2);
                         lor2D3 = maximum3(i)*(1/2*fwhm3(i)).^2./( (x-x_03(i)).^2 + (1/2*fwhm3(i))^2);
                 end
@@ -195,7 +195,7 @@ set(fig,'KeyPressFcn',@fig_Callback)
             case 'Yes' % D prime peaks
                 lorDp = maximumDp(i)*(1/2*fwhmDp(i)).^2./( (x-x_0Dp(i)).^2 + (1/2*fwhmDp(i))^2);
                 switch fitsquest
-                    case 'Yes' % Lorentzian fits and D prime peak
+                    case {'Yes','yes'} % Lorentzian fits and D prime peak
                         plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
                             x(num),lorG(num), ...
                             x(num),lorD(num), ...
@@ -206,9 +206,9 @@ set(fig,'KeyPressFcn',@fig_Callback)
                 end
             otherwise % No D prime peaks
                 switch fitsquest
-                    case 'Yes'
+                    case {'Yes','yes'}
                         switch layerNumber
-                            case {'Yes',0} % Lorentzian fits and three 2D peaks
+                            case {'Yes','yes',0, 'Buffer','buffer'} % Lorentzian fits and three 2D peaks
                                 plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
                                     x(num),lorG(num), ...
                                     x(num),lorD(num), ...
@@ -217,7 +217,7 @@ set(fig,'KeyPressFcn',@fig_Callback)
                                     x(num),lor2D3(num), ...
                                     x(num),lorG(num)+lorD(num)+lor2D(num)+lor2D2(num)+lor2D3(num));
                                 legend('Original','G','D','2D_1','2D_2','2D_3','Total');
-                            otherwise % Lorentzian fits and one 2D peaks
+                            case {'No','no',1,'Mono','mono'} % Lorentzian fits and one 2D peaks
                                 plot(ramanAxes,x(num),y_shifted_flattened_subtracted(num,i), ...
                                     x(num),lorG(num), ...
                                     x(num),lorD(num), ...
@@ -230,7 +230,7 @@ set(fig,'KeyPressFcn',@fig_Callback)
                 end
         end
         title(ramanAxes,sprintf('%d',i));
-        xlim([1400 1700])
+%         xlim([1400 1700])
         ylim(ramanAxes,[-1000,12000]);
         prettyPlotLoop(fig,14,'no')
     end

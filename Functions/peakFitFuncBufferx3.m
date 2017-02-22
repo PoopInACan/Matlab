@@ -1,16 +1,16 @@
 function [ x_01,maximum1,fwhm1,x_02,maximum2,fwhm2,x_03,maximum3,fwhm3,x_0D,maximumD,fwhmD,x_0G,maximumG,fwhmG,x_0Dp,maximumDp,fwhmDp] = peakFitFuncBufferx3( x,y,layerNumber)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
+spectraToFitFor = []; % for monolayer or buffer samples where all spectra need to be fit
 %% Use peakfit to find a good fit
-% DprimePeakindex = [16:51,65:102,114:153,166:202]; % for x3
+% spectraToFitFor = [17:51,65:102,114:153,166:204]; % for x3
 % DprimePeakindex = [35,36,37,38,39,52,53,54,55,69,70,86]; % for x947
 % DprimePeakindex = load('../../Data/Defect Positions on Raman/x949_defect_positions.txt'); % for x949
 % DprimePeakindex = load('../../Data/Defect Positions on Raman/x3_defect_positions.txt'); % for x3
 % spectraToFitFor = load('../../Data/Defect Positions on Raman/934_defect_positions.txt');
-spectraToFitFor = []; % for monolayer or buffer samples where all spectra need to be fit
 %% Initialize variables to save time in "for" loop
 numLayers = ones(1,size(y,2));
-loopLength = length(numLayers);
+% loopLength = length(numLayers);
 x_0G = ones(1,size(y,2));
 maximumG = ones(1,size(y,2));
 fwhmG = ones(1,size(y,2));
@@ -45,9 +45,10 @@ bipolar = 0; % im not bipolar
 minwidth = 10; % minimum fwhm
 %% Fitting
 h = waitbar(0,'Initializing waitbar...');
-tic;
+iniTime = clock;
+loopLength = size(y,2);
 switch layerNumber
-    case {'Yes',0, 'Buffer'} % Buffer layer
+    case {'Yes','yes',0, 'Buffer','buffer'} % Buffer layer
         for i = spectraToFitFor' % we only fit for this
             signal = [x',y(:,i)];
             % 2D peaks
@@ -69,13 +70,13 @@ switch layerNumber
                 [~,x_0G(i),maximumG(i),fwhmG(i),~] = deal(FitResults{2,:});
                 [~,x_0D(i),maximumD(i),fwhmD(i),~] = deal(FitResults{1,:});
             end
-            time_elapsed = toc;
-            time_left = time_elapsed*size(y,2)/i - time_elapsed;
-            h = waitbar(i/loopLength, h,['Time left for peak fit ' sprintf('%.2d',floor(time_left/60)) ':' sprintf('%.2d',floor(mod(time_left,60))) ]);
+%             time_elapsed = toc;
+%             time_left = time_elapsed*size(y,2)/i - time_elapsed;
+%             h = waitbar(i/loopLength, h,['Time left for peak fit ' sprintf('%.2d',floor(time_left/60)) ':' sprintf('%.2d',floor(mod(time_left,60))) ]);
         end
-    case {'No',1,'Mono'} % as-grown monolayer, fit all spectra and special spectra to signal D' peak
+    case {'No','no',1,'Mono','mono'} % as-grown monolayer, fit all spectra and special spectra to signal D' peak
         % spectraToFitFor is for D' peak
-        for i = 1:size(y,2)
+        for i = 1:loopLength
             signal = [x',y(:,i)];
             % 2D peaks
             [FitResults,LowestError,baseline,BestStart,xi,yi] = ...
@@ -120,8 +121,7 @@ switch layerNumber
                 FitResults = num2cell(FitResults);
                 [~,x_0D(i),maximumD(i),fwhmD(i),~] = deal(FitResults{1,:});
             end
-            time_elapsed = toc;
-            time_left = time_elapsed*size(y,2)/i - time_elapsed;
+            time_left = etime(clock, iniTime)*(loopLength/i-1);
             h = waitbar(i/loopLength, h,['Time left for peak fit ' sprintf('%.2d',floor(time_left/60)) ':' sprintf('%.2d',floor(mod(time_left,60))) ]);
         end
         %       These peaks are only used for buffer layer, since 2D peak has 3
@@ -131,7 +131,7 @@ switch layerNumber
 end
 
 
-close(h);
+% close(h);
 
 end
 
